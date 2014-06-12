@@ -1,0 +1,24 @@
+{
+  "name": "denma",
+  "version": "0.1.0",
+  "description": "Redis ORM which looks like GAE Python datastore API",
+  "main": "lib/denma.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/panarch/denma.git"
+  },
+  "keywords": [
+    "Redis",
+    "ORM",
+    "redis",
+    "orm"
+  ],
+  "author": "Taehoon Moon",
+  "license": "MIT-LICENSE",
+  "bugs": {
+    "url": "https://github.com/panarch/denma/issues"
+  }
+}
