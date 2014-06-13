@@ -7,9 +7,14 @@ Copyright (c) 2014 Taehoon Moon
 npm install denma
 ```
 
+## Test
+```
+mocha
+```
 
 ## Documentation
 * TODO
+
 ### Basics
 ```
 var denma = require('denma');
@@ -58,6 +63,30 @@ var indexes = [
   ]}
 ]
 ```
+
+### Properties
+
+<dl>
+  <dt>StringProperty (options)</dt>
+  <dd>.</dd>
+  
+  <dt>DateTimeProperty (options)</dt>
+  <dd>Currently, two options available
+    <dl>
+      <dt>autoNow</dt>
+      <dd>Automatically update current datetime for every time when value updated</dd>
+      
+      <dt>autoNowAdd</dt>
+      <dd>Automatically set current datetime when value inserted at first</dd>
+    </dl>
+  </dd>
+  
+  <dt>ReferenceProperty (target, options)</dt>
+  <dd>
+  Unlike GAE datastore, it does not fetch referencing object automatically, only returns key object.<br/>
+  </dd>
+</dl>
+
 
 ### MIT License
 
