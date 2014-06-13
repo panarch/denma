@@ -20,5 +20,8 @@
   "license": "MIT-LICENSE",
   "bugs": {
     "url": "https://github.com/panarch/denma/issues"
+  },
+  "dependencies": {
+    "redis": "~0.10.3"
   }
 }
