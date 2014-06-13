@@ -1,83 +1,42 @@
 // Denma Libraries.
 // Taehoon Moon <panarch@kaist.ac.kr>
 //
-// Test 
+// db test
 //
 // Copyright Taehoon Moon 2014
+
+delete require.cache[require.resolve('./models')]
+delete require.cache[require.resolve('./indexes')]
 
 var denma = require('../lib/denma');
 var db = denma.db;
 var Key = denma.Key;
 
+var assert = require('assert');
+
+var models = require('./models');
+var indexes = require('./indexes');
+var helpers = require('./helpers');
+
 var redis = require('redis');
 var client = redis.createClient();
-
-var assert = require("assert");
-
-var models = {
-    User: {
-        username: db.StringProperty(),
-        nickname: db.StringProperty(),
-        datetime: db.DateTimeProperty(),
-    },
-
-    Category: {
-        title: db.StringProperty(),
-        description: db.StringProperty()
-    },
-
-    Symbol: {
-        title: db.StringProperty(),
-        category: db.ReferenceProperty('Category')
-    },
-    
-    Test: {
-        test1: db.StringProperty(),
-        test2: db.StringProperty(),
-        datetime1: db.DateTimeProperty({ autoNowAdd: true }),
-        datetime2: db.DateTimeProperty({ autoNow: true })
-    }
-
-};
-
 var User, Category, Symbol, Test;
 
-var indexes = [
-    { User: [
-        { field: 'username' }
-    ]},
-
-    { User: [
-        { field: 'username' },
-        { field: 'nickname' }
-    ]},
-
-    { Symbol: [
-        { field: 'title' },
-        { field: 'category' }
-    ]},
-
-    { Symbol: [
-        { field: 'category' }
-    ]}
-];
-
-
-before(function() { 
-    it('init', function(done) {
-        client.select(9, function() {
-            db.init(client, models, indexes, function() {
-                User = models.User;
-                Category = models.Category;
-                Symbol = models.Symbol;
-                Test = models.Test;
-                client.flushdb(done);
-            });
-        });
-    });
-});
-
 describe('db', function() {
+    before(function(done) {
+        helpers._before(function() {
+            User = models.User;
+            Category = models.Category;
+            Symbol = models.Symbol;
+            Test = models.Test;
+            done();
+        }, db, client, models, indexes);
+    });
+
+    after(function(done) {
+        helpers._after(done, client);
+    });
+
     describe('#put', function() {
         it('put with keyName should perform without error.', function(done) {
             var t = new Test();
@@ -145,6 +104,14 @@ describe('db', function() {
                 done();
             });
         });
+
+        it('getById with unstored id should fail to retrieve', function(done) {
+            Test.getById(10, function(t, err) {
+                assert.equal(err, null);
+                assert.equal(t, null);
+                done();
+            });
+        });
     });
 
     describe('#getByIds', function() {
@@ -166,6 +133,14 @@ describe('db', function() {
                 assert.equal(err, null);
                 assert.equal(t.test1, 'Test1');
                 assert.equal(t.test2, 'Test2');
+                done();
+            });
+        });
+
+        it('getByKeyName with unstored keyName should fail to retrieve', function(done) {
+            Test.getByKeyName('WrongKeyName', function(t, err) {
+                assert.equal(err, null);
+                assert.equal(t, null);
                 done();
             });
         });
@@ -231,7 +206,9 @@ describe('db', function() {
             var t1 = new Test();
             var t2 = new Test();
             t1.put(function(err) {
+                assert.equal(err, null);
                 t2.put(function(err) {
+                    assert.equal(err, null);
                     assert.equal(t1.key.id, 3);
                     assert.equal(t2.key.id, 4);
                     done();
@@ -239,8 +216,24 @@ describe('db', function() {
             });
         });
 
+        it('Put with modifing field should be stored properly.', function(done) {
+            Test.getById(3, function(t, err) {
+                assert.equal(err, null);
+                t.test1 = 'ValueChanged';
+                t.put(function(err) {
+                    assert.equal(err, null);
+                    Test.getById(3, function(t2, err) {
+                        assert.equal(err, null);
+                        assert.equal(t2.test1, 'ValueChanged');
+                        done();
+                    });
+                });
+            });
+        });
+
         it('After deleting value, retrieving deleted value should fail.', function(done) {
             Test.getByIds([3, 4], function(tests, err) {
+                assert.equal(err, null);
                 var t1 = tests[0];
                 var t2 = tests[1];
 
