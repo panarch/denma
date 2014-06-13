@@ -202,7 +202,7 @@ describe('db', function() {
             function end(err) {
                 assert.equal(err, null);
                 c++;
-                if(c === 4) {
+                if (c === 4) {
                     done();
                 }
             }
@@ -262,7 +262,7 @@ describe('db', function() {
                 });
 
                 function end() {
-                    if(c === 2) {
+                    if (c === 2) {
                         done();
                     }
                 }
